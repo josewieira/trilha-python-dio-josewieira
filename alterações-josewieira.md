@@ -1,162 +1,287 @@
-# 💰 Sistema Bancário em Python — V1
+# 💰 Sistema Bancário em Python — V2.0
 
-Este projeto foi desenvolvido como parte de um desafio proposto por um banco fictício. Ele simula as operações básicas de uma conta bancária utilizando Python puro e a biblioteca padrão.
+ 
 
----
+Este projeto foi desenvolvido como parte de um desafio proposto por um banco fictício. Ele simula operações reais de uma conta bancária com foco em estrutura modular, uso de boas práticas em Python e experiência do usuário próxima à de um banco digital. 
 
-## 📌 Funcionalidades
+ 
 
-- ✅ Depósitos com validação
-- ✅ Saques com limite de valor e quantidade diária
-- ✅ Registro de extrato com data e hora
-- ✅ Exibição de extrato formatado
-- ✅ Sistema em loop contínuo até o usuário desejar sair
+--- 
 
----
+ 
 
-## 🧠 Conceitos de Python utilizados no projeto
+## 📌 Funcionalidades 
 
-### ➕ Operadores Aritméticos
+ 
 
-Utilizei para cálculos de saldo e controle de limites:
+- ✅ Identificação do cliente via CPF 
 
-python
-saldo += valor          # Soma valor ao saldo (depósito)
-saldo -= valor          # Subtrai valor do saldo (saque)
-excedeu_saldo = valor > saldo    # Verifica se o saque é maior que o saldo
+- ✅ Criação de novos usuários com CPF único 
 
+- ✅ Abertura de contas bancárias vinculadas a usuários 
 
-Também são usados para comparações (>, >=) e contagem de saques (numero_saques += 1).
+- ✅ Depósitos com validação 
 
----
+- ✅ Saques com limite de valor e quantidade diária 
 
-### 🔀 Estruturas Condicionais
+- ✅ Registro detalhado de extrato com data e hora 
 
-Usadas para *tomar decisões* com base em condições:
+- ✅ Exibição de extrato formatado 
 
-python
-if valor > 0:
-    saldo += valor
-    registrar_operacao("Depósito", valor)
-elif valor <= 0:
-    print("Valor inválido.")
+- ✅ Sistema modularizado com funções reutilizáveis 
 
+- ✅ Uso de diferentes tipos de argumentos (posicional, nomeado) 
 
-Também usadas para:
-- Verificar se excedeu o limite de saque
-- Validar opção digitada pelo usuário
-- Exibir mensagens diferentes no extrato
+- ✅ Simulação de sessão única para cliente logado 
 
----
+ 
 
-### 🔁 Estruturas de Repetição
+--- 
 
-A repetição principal é feita com while True, que mantém o sistema rodando até que o usuário escolha sair (q):
+ 
 
-python
-while True:
-    opcao = input(menu).lower().strip()
+## 🧩 Funções utilizadas 
 
-    if opcao == "q":
-        break
+ 
 
+O sistema foi totalmente modularizado. Abaixo estão as principais funções, suas assinaturas e objetivos: 
 
-Esse loop permite que o usuário realize várias operações seguidas no sistema.
+ 
 
----
+### 🏦 Funções bancárias 
 
-### 🧵 Métodos da Classe String
+ 
 
-Utilizei diversos métodos internos da classe str:
+| Função | Assinatura | Descrição | 
 
-python
-opcao = input(menu).lower().strip()
+|-------|------------|-----------| 
 
+| `depositar` | `depositar(saldo, valor, extrato, /)` | Realiza depósito com validação. Usa argumentos **posicionais apenas**. | 
 
-- .lower() → transforma a entrada em minúscula
-- .strip() → remove espaços antes e depois
-- .append(...) → adiciona a string do extrato à lista
-- .format() (usado indiretamente com f-strings) → para formatar os valores
+| `sacar` | `sacar(*, saldo, valor, extrato, numero_saques)` | Realiza saque com regras. Usa argumentos **keyword-only**. | 
 
----
+| `mostrar_extrato` | `mostrar_extrato(saldo, /, *, extrato)` | Exibe extrato com saldo atual. Usa **posicional + keyword-only**. | 
 
-### 💬 Interpolação de Variáveis
+| `registrar_operacao` | `registrar_operacao(extrato, tipo, valor)` | Adiciona uma linha de movimentação com data/hora no extrato. | 
 
-Feita com *f-strings*, forma moderna e eficiente de embutir variáveis dentro de strings:
+ 
 
-python
-print(f"Saldo atual: R$ {saldo:.2f}")
-operacao = f"{timestamp} - Saque: R$ {valor:.2f}"
+### 👤 Funções de usuário e conta 
 
+ 
 
-Usei :.2f para exibir valores com *duas casas decimais*, no padrão monetário brasileiro.
+| Função | Descrição | 
 
----
+|--------|-----------| 
 
-### 🔍 Fatiamento de Strings
+| `criar_usuario()` | Solicita dados e cadastra novo cliente com CPF único. | 
 
-Não utilizei diretamente fatiamento no estilo clássico, como texto[0:5], mas usei a função strftime() da classe datetime para *fatiar e formatar a string da data*:
+| `criar_conta(usuario)` | Cria uma conta bancária vinculada ao usuário. | 
 
-python
-timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+| `encontrar_usuario_por_cpf(cpf)` | Busca um cliente na base de usuários pelo CPF. | 
 
+| `encontrar_conta_por_usuario(usuario)` | Busca uma conta vinculada ao usuário. | 
 
-Isso gera uma string da data no formato brasileiro, a partir de um objeto completo datetime.
+| `listar_contas()` | Mostra todas as contas cadastradas. | 
 
----
+ 
 
-### 📄 Strings de Múltiplas Linhas
+### 💬 Fluxo do sistema 
 
-Usadas para exibir o menu principal com clareza visual e legibilidade:
+ 
 
-python
-menu = """
-=============== MENU ===============
+| Função | Descrição | 
 
-[d] Depositar
-[s] Sacar
-[e] Extrato
-[q] Sair
+|--------|-----------| 
 
-=> """
+| `menu_inicial()` | Fluxo principal. Solicita CPF e conduz ao cadastro ou menu bancário. | 
 
+| `menu_operacoes(usuario, conta)` | Menu de operações após o login, com sessão individual de saldo e extrato. | 
 
-Também são usadas para imprimir o extrato com blocos visuais como:
+ 
 
-python
-print("\n================ EXTRATO ================")
+--- 
 
+ 
 
----
+## 🧠 Conceitos de Python utilizados no projeto 
 
-## 🧾 Requisitos Técnicos Atendidos
+ 
 
-- [x] Saques limitados a R$ 500 por operação
-- [x] Máximo de 3 saques diários
-- [x] Validação de entrada (valores negativos, letras, etc.)
-- [x] Registro de data/hora das transações com datetime
-- [x] Exibição do saldo atualizado ao final do extrato
+### 🧩 Modularização e Boas Práticas 
 
----
+ 
 
-## 🕓 Módulo Extra: datetime
+Cada operação foi isolada em uma função clara. Parâmetros foram estruturados com os tipos corretos (posicional, nomeado ou ambos). 
 
-Foi utilizado o módulo datetime para *registrar data e hora de cada operação*:
+ 
 
-python
-from datetime import datetime
+--- 
 
+ 
 
-Usado assim:
+### ➕ Operadores Aritméticos 
 
-python
-timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+ 
 
+```python 
 
-Essa funcionalidade traz *rastreabilidade* para os registros no extrato, como um sistema bancário real faria.
+saldo += valor 
 
----
+saldo -= valor 
 
-## 🤝 Agradecimentos
+numero_saques += 1 
 
-Sou grato ao conteúdo fornecido pelo curso, que foi essencial para minha participação e execução  deste projeto. 
+``` 
+
+ 
+
+--- 
+
+ 
+
+### 🔀 Estruturas Condicionais 
+
+ 
+
+```python 
+
+if valor > saldo: 
+
+    print("Saldo insuficiente") 
+
+elif numero_saques >= LIMITE_SAQUES_DIARIOS: 
+
+    print("Limite atingido") 
+
+``` 
+
+ 
+
+--- 
+
+ 
+
+### 🔁 Estruturas de Repetição 
+
+ 
+
+Dois laços principais: 
+
+- `while True` no menu inicial 
+
+- `while True` no menu do cliente 
+
+ 
+
+--- 
+
+ 
+
+### 🔍 Métodos de String 
+
+ 
+
+```python 
+
+cpf = input(...).strip() 
+
+opcao = input(...).lower().strip() 
+
+``` 
+
+ 
+
+--- 
+
+ 
+
+### 💬 f-Strings e Interpolação 
+
+ 
+
+```python 
+
+print(f"Saldo atual: R$ {saldo:.2f}") 
+
+``` 
+
+ 
+
+--- 
+
+ 
+
+### 🕓 Módulo datetime 
+
+ 
+
+```python 
+
+from datetime import datetime 
+
+timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S") 
+
+``` 
+
+ 
+
+--- 
+
+ 
+
+## ✅ Requisitos Técnicos Atendidos 
+
+ 
+
+- [x] Sistema de autenticação via CPF 
+
+- [x] Cadastro único por CPF 
+
+- [x] Abertura de conta com vínculo ao cliente 
+
+- [x] Saques limitados a R$500 e 3 por dia 
+
+- [x] Validações robustas para valores e entradas 
+
+- [x] Registro de operações com data/hora 
+
+- [x] Separação lógica com funções modulares 
+
+- [x] Tipagem avançada de parâmetros de função 
+
+ 
+
+--- 
+
+ 
+
+## 🚀 Próximos Passos (Planejados) 
+
+ 
+
+- 💾 Armazenamento em arquivos `.json` para persistência de dados 
+
+- 🔐 Autenticação com senha 
+
+- 📊 Exportação de extrato para `.csv` 
+
+- 🌐 Interface gráfica com Tkinter ou interface web com Flask/Streamlit 
+
+- ✅ Testes automatizados com `pytest` 
+
+ 
+
+--- 
+
+ 
+
+## 🤝 Agradecimentos 
+
+ 
+
+Sou grato ao conteúdo do curso e aos desafios propostos, que permitiram desenvolver não apenas um sistema funcional, mas também a capacidade de pensar como desenvolvedor profissional, com foco em modularidade, clareza e boas práticas. 
+
+ 
+
+--- 
